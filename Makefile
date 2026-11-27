@@ -1,12 +1,24 @@
-CXX     ?= clang++
-CXXFLAGS?= -O2 -Wall -Wextra -std=c++17 -D_GNU_SOURCE
-TARGET   = sigmaker
-OBJS     = main.o elf.o scan.o sig.o out.o reloc.o
+CXX ?= g++
+CXXFLAGS ?= -std=c++17 -Wall -Wextra -O2 -Iinclude
+SRC_DIR = src
+OBJ_DIR = build
+TARGET = sigmaker_bin
+
+SRCS = $(wildcard $(SRC_DIR)/*.cpp)
+OBJS = $(patsubst $(SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(SRCS))
+
 all: $(TARGET)
+
 $(TARGET): $(OBJS)
 	$(CXX) $(CXXFLAGS) -o $@ $(OBJS)
-%.o: %.cpp
-	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp | $(OBJ_DIR)
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+$(OBJ_DIR):
+	mkdir -p $(OBJ_DIR)
+
 clean:
-	rm -f $(OBJS) $(TARGET)
+	rm -rf $(OBJ_DIR) $(TARGET) sigmaker
+
 .PHONY: all clean
